@@ -1,0 +1,20 @@
+{
+  "source_branch": "/path/to/branch_A",
+  "target_branch": "/path/to/branch_B",
+  "match_patterns": {
+    "bug": "--bug=(\\w+)",
+    "user": "--user=yingjie\\.cui"
+  },
+  "log_file": "logs/merge.log",
+  "check_interval": 300,
+  "ollama": {
+    "model": "qwen2.5:7b",
+    "base_url": "http://localhost:11434",
+    "enabled": true
+  },
+  "ai_features": {
+    "conflict_analysis": true,
+    "smart_suggestions": true,
+    "natural_language_config": true
+  }
+}

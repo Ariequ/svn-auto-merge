@@ -1,0 +1,48 @@
+#!/bin/bash
+# SVN Post-Commit 钩子脚本
+# 当A分支有提交时，自动检查是否需要合并到B分支
+
+# 配置参数
+REPOS=""
+REV=""
+TOOL_PATH="/path/to/svn-auto-merge"  # 修改为实际工具路径
+PYTHON_PATH="/usr/bin/python3"       # 修改为实际Python路径
+
+# 日志文件
+LOG_FILE="/logs/hook.log"
+
+# 创建日志目录
+mkdir -p ""
+
+# 记录钩子执行
+echo "10/14/2025 10:48:55: Post-commit hook triggered for revision " >> ""
+
+# 检查工具路径是否存在
+if [ ! -d "" ]; then
+    echo "10/14/2025 10:48:55: Error: Tool path  does not exist" >> ""
+    exit 1
+fi
+
+# 检查Python是否存在
+if [ ! -f "" ]; then
+    echo "10/14/2025 10:48:55: Error: Python not found at " >> ""
+    exit 1
+fi
+
+# 切换到工具目录
+cd "" || {
+    echo "10/14/2025 10:48:55: Error: Cannot change to directory " >> ""
+    exit 1
+}
+
+# 执行自动合并工具
+"" svn_auto_merge.py --mode hook --revision "" --repo-path "" >> "" 2>&1
+
+# 记录执行结果
+if [ True -eq 0 ]; then
+    echo "10/14/2025 10:48:55: Hook execution completed successfully" >> ""
+else
+    echo "10/14/2025 10:48:55: Hook execution failed with exit code True" >> ""
+fi
+
+exit 0
