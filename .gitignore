@@ -1,7 +1,17 @@
+# SVN Auto Merge Tool - .gitignore
+
+# 临时文件
+hook_signal.txt
+merge_requests.json
+merge_requests_backup.json
+
+# 测试目录
+test_svn/
+
 # Python
 __pycache__/
 *.py[cod]
-*.class
+*$py.class
 *.so
 .Python
 build/
@@ -21,12 +31,10 @@ wheels/
 *.egg
 MANIFEST
 
-# Virtual Environment
+# 虚拟环境
 venv/
 env/
 ENV/
-env.bak/
-venv.bak/
 
 # IDE
 .vscode/
@@ -35,25 +43,14 @@ venv.bak/
 *.swo
 *~
 
-# OS
+# 日志文件（可选，根据需要调整）
+# logs/
+# *.log
+
+# 系统文件
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
-# Logs
-logs/
-*.log
-
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# State files
-last_revision.txt
+# 配置文件备份
+*.bak
+*.backup
