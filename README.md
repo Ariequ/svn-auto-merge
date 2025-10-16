@@ -29,22 +29,22 @@
 #### 方法一：一键启动（推荐）
 
 **Windows:**
-`cmd
+```cmd
 # 双击运行
 start.bat
-`
+```
 
 **macOS/Linux:**
-`ash
+```bash
 # 运行启动脚本
 ./start.sh
-`
+```
 
 #### 方法二：手动安装
 
-`ash
+```bash
 # 1. 克隆仓库
-git clone https://github.com/YOUR_USERNAME/svn-auto-merge.git
+git clone https://github.com/Ariequ/svn-auto-merge.git
 cd svn-auto-merge
 
 # 2. 创建虚拟环境
@@ -55,13 +55,13 @@ venv\Scripts\activate     # Windows
 
 # 3. 安装依赖
 pip install -r requirements.txt
-`
+```
 
 ### 配置设置
 
 编辑 config.json 文件：
 
-`json
+```json
 {
   "source_branch": "/path/to/branch_A",
   "target_branch": "/path/to/branch_B",
@@ -77,7 +77,7 @@ pip install -r requirements.txt
     "enabled": true
   }
 }
-`
+```
 
 ## 🎯 工作原理
 
@@ -88,9 +88,9 @@ pip install -r requirements.txt
 - --user=yingjie.cui
 
 示例匹配的提交信息：
-`
+```
 修复登录问题 --bug=12345 --user=yingjie.cui
-`
+```
 
 ### 自动合并流程
 
@@ -105,9 +105,9 @@ pip install -r requirements.txt
 
 ### 交互式模式（默认）
 
-`ash
+```bash
 python svn_auto_merge.py
-`
+```
 
 支持的命令：
 - check: 检查新提交
@@ -119,41 +119,41 @@ python svn_auto_merge.py
 
 ### 定时检查模式
 
-`ash
+```bash
 python svn_auto_merge.py --mode schedule
-`
+```
 
 ### SVN钩子模式
 
-`ash
+```bash
 python svn_auto_merge.py --mode hook --revision 123 --repo-path /path/to/repo
-`
+```
 
 ## 🤖 AI功能设置
 
 ### 安装Ollama
 
 **macOS/Linux:**
-`ash
+```bash
 curl -fsSL https://ollama.ai/install.sh | sh
-`
+```
 
 **Windows:**
 下载安装包：https://ollama.ai/download
 
 ### 下载模型
 
-`ash
+```bash
 # 下载Qwen2.5模型
 ollama pull qwen2.5:7b
 
 # 启动Ollama服务
 ollama serve
-`
+```
 
 ## 📁 项目结构
 
-`
+```
 svn-auto-merge/
 ├── svn_auto_merge.py          # 主程序
 ├── config.json                # 配置文件
@@ -164,7 +164,7 @@ svn-auto-merge/
 ├── PROJECT_SUMMARY.md         # 项目总结
 ├── GITHUB_SETUP.md           # GitHub设置指南
 └── .gitignore                # Git忽略文件
-`
+```
 
 ## 🔧 部署选项
 
@@ -176,68 +176,41 @@ svn-auto-merge/
 ### 生产环境
 - SVN钩子模式，实时响应提交
 - 定时任务模式，定期检查
-- 系统服务部署，后台运行
+- 自动冲突处理和回滚
 
-## 🛡️ 安全特性
+## 📊 监控和维护
 
-- 冲突时自动回滚
-- 详细的操作日志
-- 权限控制和访问限制
-- 配置文件验证
+### 日志监控
+- 定期检查 `logs/merge.log`
+- 关注错误信息和警告
+- 监控合并成功率
 
-## 📊 日志和监控
-
-### 日志文件
-- logs/merge.log: 主要操作日志
-- logs/hook.log: 钩子执行日志
-- logs/last_revision.txt: 最后检查的版本号
-
-## 🐛 故障排除
-
-### 常见问题
-
-1. **Python依赖安装失败**
-   `ash
-   pip install --upgrade pip
-   pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/
-   `
-
-2. **SVN命令找不到**
-   - Windows: 安装TortoiseSVN或VisualSVN
-   - macOS: rew install subversion
-   - Linux: sudo apt-get install subversion
-
-3. **Ollama连接失败**
-   `ash
-   curl http://localhost:11434/api/tags
-   ollama serve
-   `
+### 性能监控
+- 检查SVN操作性能
+- 监控磁盘空间使用
+- 关注内存使用情况
 
 ## 🤝 贡献指南
 
-欢迎提交Issue和Pull Request来改进这个工具。
-
-### 开发环境设置
-
-`ash
-git clone https://github.com/YOUR_USERNAME/svn-auto-merge.git
-cd svn-auto-merge
-pip install -r requirements.txt
-`
+1. Fork 项目
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 打开 Pull Request
 
 ## 📄 许可证
 
-MIT License
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
 
-## 📝 更新日志
+## 📞 支持
 
-### v1.0.0
-- 初始版本发布
-- 支持基本的自动合并功能
-- 集成AI冲突分析
-- 提供交互式界面
-- 支持多种触发方式
+如果您遇到问题或有建议，请：
+
+1. 查看 [CHANGELOG.md](CHANGELOG.md) 了解最新更新
+2. 查看 [DEPLOYMENT.md](DEPLOYMENT.md) 了解部署指南
+3. 提交 Issue 或 Pull Request
 
 ---
 
-如有问题或建议，请提交Issue或联系维护者。
+**版本**: v1.0.0  
+**最后更新**: 2025-10-16
