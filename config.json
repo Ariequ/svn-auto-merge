@@ -1,12 +1,12 @@
 {
-  "source_branch": "/path/to/branch_A",
-  "target_branch": "/path/to/branch_B",
+  "source_branch": "E:\\DC\\dc_client\\branches\\portrait",
+  "target_branch": "E:\\DC\\dc_client\\branches\\next_p",
   "match_patterns": {
     "bug": "--bug=(\\w+)",
     "user": "--user=yingjie\\.cui"
   },
   "log_file": "logs/merge.log",
-  "check_interval": 300,
+  "check_interval": 3,
   "ollama": {
     "model": "qwen2.5:7b",
     "base_url": "http://localhost:11434",
