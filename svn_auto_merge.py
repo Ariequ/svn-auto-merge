@@ -444,7 +444,6 @@ class SVNAgent:
         match_patterns = self.config.get('match_patterns', {})
         
         if not match_patterns:
-            console.print(f"[yellow]提交 {commit['revision']} 没有配置匹配规则，默认不合并[/yellow]")
             return False
         
         # 必须匹配所有规则才能合并 (AND逻辑)
@@ -452,17 +451,15 @@ class SVNAgent:
         for pattern_name, pattern in match_patterns.items():
             if re.search(pattern, message, re.IGNORECASE):
                 matched_patterns.append(pattern_name)
-                console.print(f"[green]提交 {commit['revision']} 匹配规则 '{pattern_name}': {pattern}[/green]")
-            else:
-                console.print(f"[red]提交 {commit['revision']} 不匹配规则 '{pattern_name}': {pattern}[/red]")
         
         # 只有当所有规则都匹配时才合并
         should_merge = len(matched_patterns) == len(match_patterns)
         
+        # 只有符合规则的提交才输出详细日志
         if should_merge:
             console.print(f"[green]✅ 提交 {commit['revision']} 匹配所有规则，将进行合并[/green]")
-        else:
-            console.print(f"[yellow]❌ 提交 {commit['revision']} 只匹配 {len(matched_patterns)}/{len(match_patterns)} 个规则，跳过合并[/yellow]")
+            for pattern_name, pattern in match_patterns.items():
+                console.print(f"[green]  匹配规则 '{pattern_name}': {pattern}[/green]")
         
         return should_merge
     
