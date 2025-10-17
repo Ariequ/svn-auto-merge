@@ -443,13 +443,28 @@ class SVNAgent:
         # 检查匹配规则
         match_patterns = self.config.get('match_patterns', {})
         
+        if not match_patterns:
+            console.print(f"[yellow]提交 {commit['revision']} 没有配置匹配规则，默认不合并[/yellow]")
+            return False
+        
+        # 必须匹配所有规则才能合并 (AND逻辑)
+        matched_patterns = []
         for pattern_name, pattern in match_patterns.items():
             if re.search(pattern, message, re.IGNORECASE):
+                matched_patterns.append(pattern_name)
                 console.print(f"[green]提交 {commit['revision']} 匹配规则 '{pattern_name}': {pattern}[/green]")
-                return True
+            else:
+                console.print(f"[red]提交 {commit['revision']} 不匹配规则 '{pattern_name}': {pattern}[/red]")
         
-        # 如果没有匹配规则，默认不合并
-        return False
+        # 只有当所有规则都匹配时才合并
+        should_merge = len(matched_patterns) == len(match_patterns)
+        
+        if should_merge:
+            console.print(f"[green]✅ 提交 {commit['revision']} 匹配所有规则，将进行合并[/green]")
+        else:
+            console.print(f"[yellow]❌ 提交 {commit['revision']} 只匹配 {len(matched_patterns)}/{len(match_patterns)} 个规则，跳过合并[/yellow]")
+        
+        return should_merge
     
     def _perform_merge(self, commit: Dict) -> bool:
         """执行自动合并，返回是否成功"""
