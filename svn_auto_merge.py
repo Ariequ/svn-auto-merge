@@ -569,9 +569,26 @@ class SVNAgent:
                 result = subprocess.run(cleanup_cmd, capture_output=True, text=True)
                 if result.returncode != 0:
                     console.print(f"[yellow]清理警告: {result.stderr}[/yellow]")
-                    # 如果清理失败，尝试跳过清理继续
-                    console.print("[yellow]清理失败，尝试跳过清理步骤继续...[/yellow]")
-                    skip_cleanup = True
+                    
+                    # 检查是否是锁定问题
+                    if "E155004" in result.stderr and "locked" in result.stderr:
+                        console.print("[yellow]检测到SVN锁定问题，尝试自动修复...[/yellow]")
+                        if self._fix_svn_locks(target_branch):
+                            console.print("[green]SVN锁定问题已自动修复[/green]")
+                            # 重新尝试清理
+                            result = subprocess.run(cleanup_cmd, capture_output=True, text=True)
+                            if result.returncode == 0:
+                                console.print("[green]清理成功[/green]")
+                            else:
+                                console.print(f"[yellow]清理仍然失败: {result.stderr}[/yellow]")
+                                skip_cleanup = True
+                        else:
+                            console.print("[red]自动修复SVN锁定失败[/red]")
+                            skip_cleanup = True
+                    else:
+                        # 如果清理失败，尝试跳过清理继续
+                        console.print("[yellow]清理失败，尝试跳过清理步骤继续...[/yellow]")
+                        skip_cleanup = True
                 
                 if not skip_cleanup:
                     # 2. 还原所有本地修改
@@ -604,6 +621,48 @@ class SVNAgent:
         finally:
             # 恢复原始目录
             os.chdir(original_dir)
+    
+    def _fix_svn_locks(self, target_branch: str) -> bool:
+        """自动修复SVN锁定问题"""
+        try:
+            console.print("[blue]开始自动修复SVN锁定问题...[/blue]")
+            
+            # 1. 终止SVN进程
+            try:
+                result = subprocess.run(['tasklist', '/FI', 'IMAGENAME eq svn.exe'], 
+                                      capture_output=True, text=True)
+                if 'svn.exe' in result.stdout:
+                    console.print("[dim]终止SVN进程...[/dim]")
+                    subprocess.run(['taskkill', '/IM', 'svn.exe', '/F'], 
+                                  capture_output=True, text=True)
+                    time.sleep(1)
+            except:
+                pass
+            
+            # 2. 删除锁定文件
+            lock_files = ['.svn/wc.db-journal', '.svn/lock', '.svn/entries.lock']
+            deleted_count = 0
+            
+            for lock_file in lock_files:
+                if os.path.exists(lock_file):
+                    try:
+                        os.remove(lock_file)
+                        deleted_count += 1
+                    except:
+                        pass
+            
+            if deleted_count > 0:
+                console.print(f"[dim]删除了 {deleted_count} 个锁定文件[/dim]")
+            
+            # 3. 重新尝试清理
+            cleanup_cmd = ['svn', 'cleanup']
+            result = subprocess.run(cleanup_cmd, capture_output=True, text=True, timeout=30)
+            
+            return result.returncode == 0
+            
+        except Exception as e:
+            console.print(f"[red]修复SVN锁定时出错: {e}[/red]")
+            return False
     
     def _show_merge_confirmation(self, commit: Dict) -> bool:
         """显示合并确认对话框"""
