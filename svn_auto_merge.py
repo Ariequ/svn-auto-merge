@@ -466,52 +466,62 @@ class SVNAgent:
             console.print(f"[dim]作者: {commit['author']}[/dim]")
             console.print(f"[dim]消息: {commit['message'][:80]}...[/dim]")
             
-            # 1. 清理并更新目标分支
-            console.print(f"\n[blue]步骤1: 清理并更新目标分支[/blue]")
+            # 1. 确认清理目标分支
+            console.print(f"\n[blue]步骤1: 确认清理目标分支[/blue]")
             console.print(f"[dim]目标分支: {target_branch}[/dim]")
-            self.logger.info(f"步骤1: 开始清理并更新目标分支 {target_branch}")
+            self.logger.info(f"步骤1: 确认清理目标分支 {target_branch}")
+            
+            if not self._confirm_target_branch_cleanup(target_branch):
+                console.print("[yellow]用户取消目标分支清理，取消合并[/yellow]")
+                self.logger.info("用户取消目标分支清理，取消合并")
+                return False
+            
+            # 2. 清理并更新目标分支
+            console.print(f"\n[blue]步骤2: 清理并更新目标分支[/blue]")
+            console.print(f"[dim]目标分支: {target_branch}[/dim]")
+            self.logger.info(f"步骤2: 开始清理并更新目标分支 {target_branch}")
             
             if not self._clean_and_update_target_branch(target_branch):
                 console.print("[red]目标分支清理更新失败，取消合并[/red]")
                 self.logger.error("目标分支清理更新失败，取消合并")
                 return False
             
-            console.print("[green]步骤1完成: 目标分支清理更新成功[/green]")
-            self.logger.info("步骤1完成: 目标分支清理更新成功")
+            console.print("[green]步骤2完成: 目标分支清理更新成功[/green]")
+            self.logger.info("步骤2完成: 目标分支清理更新成功")
             
-            # 2. 显示合并确认对话框
-            console.print(f"\n[yellow]步骤2: 确认合并提交[/yellow]")
-            self.logger.info(f"步骤2: 显示合并确认对话框，提交 {commit['revision']}")
+            # 3. 显示合并确认对话框
+            console.print(f"\n[yellow]步骤3: 确认合并提交[/yellow]")
+            self.logger.info(f"步骤3: 显示合并确认对话框，提交 {commit['revision']}")
             
             if not self._show_merge_confirmation(commit):
                 console.print("[yellow]用户取消合并操作[/yellow]")
                 self.logger.info("用户取消合并操作")
                 return False
             
-            console.print("[green]步骤2完成: 用户确认合并[/green]")
-            self.logger.info("步骤2完成: 用户确认合并")
+            console.print("[green]步骤3完成: 用户确认合并[/green]")
+            self.logger.info("步骤3完成: 用户确认合并")
             
-            # 3. 执行SVN合并
-            console.print(f"\n[yellow]步骤3: 执行SVN合并操作[/yellow]")
+            # 4. 执行SVN合并
+            console.print(f"\n[yellow]步骤4: 执行SVN合并操作[/yellow]")
             console.print(f"[dim]源分支: {source_branch}[/dim]")
             console.print(f"[dim]目标分支: {target_branch}[/dim]")
             console.print(f"[dim]合并版本: {commit['revision']}[/dim]")
-            self.logger.info(f"步骤3: 开始执行SVN合并，版本 {commit['revision']}")
+            self.logger.info(f"步骤4: 开始执行SVN合并，版本 {commit['revision']}")
             
             merge_result = self._execute_svn_merge(source_branch, target_branch, commit)
             
             if merge_result['success']:
-                console.print("[green]步骤3完成: SVN合并操作成功[/green]")
-                self.logger.info("步骤3完成: SVN合并操作成功")
+                console.print("[green]步骤4完成: SVN合并操作成功[/green]")
+                self.logger.info("步骤4完成: SVN合并操作成功")
                 
-                # 4. 生成并提交合并信息
-                console.print(f"\n[blue]步骤4: 生成并提交合并信息[/blue]")
-                self.logger.info("步骤4: 开始生成并提交合并信息")
+                # 5. 生成并提交合并信息
+                console.print(f"\n[blue]步骤5: 生成并提交合并信息[/blue]")
+                self.logger.info("步骤5: 开始生成并提交合并信息")
                 
                 self._commit_merge_with_message(source_branch, target_branch, commit, merge_result)
                 
-                console.print("[green]步骤4完成: 合并信息提交成功[/green]")
-                self.logger.info("步骤4完成: 合并信息提交成功")
+                console.print("[green]步骤5完成: 合并信息提交成功[/green]")
+                self.logger.info("步骤5完成: 合并信息提交成功")
                 
                 console.print(f"\n[bold green]✅ 合并成功! 提交 {commit['revision']} 已合并到目标分支[/bold green]")
                 self.logger.info(f"自动合并成功: 提交 {commit['revision']} 从 {source_branch} 合并到 {target_branch}")
@@ -523,9 +533,9 @@ class SVNAgent:
                 return True
                     
             else:
-                console.print(f"[red]步骤3失败: SVN合并操作失败[/red]")
+                console.print(f"[red]步骤4失败: SVN合并操作失败[/red]")
                 console.print(f"[red]错误信息: {merge_result['error']}[/red]")
-                self.logger.error(f"步骤3失败: SVN合并操作失败 - {merge_result['error']}")
+                self.logger.error(f"步骤4失败: SVN合并操作失败 - {merge_result['error']}")
                 
                 # 检查是否是冲突问题
                 if "conflict" in merge_result['error'].lower():
@@ -662,6 +672,47 @@ class SVNAgent:
             
         except Exception as e:
             console.print(f"[red]修复SVN锁定时出错: {e}[/red]")
+            return False
+    
+    def _confirm_target_branch_cleanup(self, target_branch: str) -> bool:
+        """确认清理目标分支"""
+        try:
+            # 检查是否在Hook模式下运行
+            if self._is_hook_mode():
+                console.print("\n" + "="*60)
+                console.print("[bold green]Hook模式自动确认清理目标分支[/bold green]")
+                console.print("="*60)
+                console.print(f"[cyan]目标分支:[/cyan] {target_branch}")
+                console.print("[yellow]⚠️  即将执行以下操作:[/yellow]")
+                console.print("  • 清理工作副本 (svn cleanup)")
+                console.print("  • 还原本地修改 (svn revert -R .)")
+                console.print("  • 更新到最新版本 (svn update)")
+                console.print("="*60)
+                console.print("[green]✅ Hook模式自动确认清理[/green]")
+                return True
+
+            # 交互模式下显示确认对话框
+            console.print("\n" + "="*60)
+            console.print("[bold yellow]清理目标分支确认[/bold yellow]")
+            console.print("="*60)
+            console.print(f"[cyan]目标分支:[/cyan] {target_branch}")
+            console.print("[yellow]⚠️  即将执行以下操作:[/yellow]")
+            console.print("  • 清理工作副本 (svn cleanup)")
+            console.print("  • 还原本地修改 (svn revert -R .)")
+            console.print("  • 更新到最新版本 (svn update)")
+            console.print("="*60)
+            console.print("[red]⚠️  注意: 这将清除目标分支的所有本地修改![/red]")
+            console.print("="*60)
+
+            # 使用rich的Prompt来获取用户确认
+            from rich.prompt import Confirm
+            confirm = Confirm.ask("是否确认清理目标分支?", default=False)
+
+            return confirm
+
+        except Exception as e:
+            console.print(f"[red]显示清理确认对话框时出错: {e}[/red]")
+            # 如果确认对话框失败，默认不清理
             return False
     
     def _show_merge_confirmation(self, commit: Dict) -> bool:
